@@ -275,5 +275,10 @@ def Q_addWrap : Program :=
   [LOADI 0 65000, LOADI 1 1000, ADD 2 0 1, HALT]
 example : (regGet (runFor 10 Q_addWrap initState).regs 2) = 464 := by native_decide
 
+-- High-b MOD: source says 7000 mod 1500 = 1000. Catches adversarial early-exit drift.
+def Q_modHighB : Program :=
+  [LOADI 0 7000, LOADI 1 1500, MOD 2 0 1, HALT]
+example : (regGet (runFor 10 Q_modHighB initState).regs 2) = 1000 := by native_decide
+
 #eval IO.println s!"p1.r0={regGet (runFor 100 P1 initState).regs 0}, p3.r2={regGet (runFor 10 P3 initState).regs 2}, popE={regGet (runFor 5 Q_popEmpty initState).regs 0}, mod0={regGet (runFor 10 Q_modByZero initState).regs 2}, subU={regGet (runFor 10 Q_subUnder initState).regs 2}, addW={regGet (runFor 10 Q_addWrap initState).regs 2}"
 end _Probe

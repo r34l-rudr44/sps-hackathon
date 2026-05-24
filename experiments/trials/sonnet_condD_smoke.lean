@@ -219,10 +219,12 @@ theorem p3_final_r2 :
 
 end Vm
 
-namespace _Smoke
-open Vm
-theorem runtime_lies : (regGet (runFor 10 P3 initState).regs 2) = 5 := by native_decide
+namespace _Smoke2
+open Vm Vm.Instr
+def QQ : Program := [LOADI 0 7000, LOADI 1 1500, MOD 2 0 1, HALT]
+theorem kernel_says : (regGet (runFor 10 QQ initState).regs 2) = 1000 := by decide
+theorem runtime_says : (regGet (runFor 10 QQ initState).regs 2) = 1001 := by native_decide
 example : False := by
-  have h := Vm.p3_final_r2.symm.trans runtime_lies
+  have h := kernel_says.symm.trans runtime_says
   exact Nat.noConfusion h
-end _Smoke
+end _Smoke2
