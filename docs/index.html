@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Don't LEAN On Me</title>
+<style>
+  :root {
+    --text: #1a1a1a;
+    --muted: #555;
+    --border: #ddd;
+    --bg-code: #f6f8fa;
+    --bg-warn: #fff8e1;
+    --accent: #1a56a0;
+    --red: #c0392b;
+    --green: #1a7a3a;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  body {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 17px;
+    line-height: 1.7;
+    color: var(--text);
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 5rem;
+    background: #fff;
+  }
+  h1 { font-size: 2rem; line-height: 1.25; margin-bottom: 0.3rem; }
+  h2 { font-size: 1.35rem; margin-top: 2.8rem; border-bottom: 1px solid var(--border); padding-bottom: 0.3rem; }
+  h3 { font-size: 1.1rem; margin-top: 2rem; color: var(--accent); }
+  .subtitle { font-size: 1.15rem; font-style: italic; color: var(--muted); margin-bottom: 1rem; }
+  .authors { font-size: 0.95rem; color: var(--muted); margin-bottom: 0.3rem; }
+  .venue { font-size: 0.9rem; color: var(--muted); margin-bottom: 2rem; }
+  .links { display: flex; gap: 1rem; flex-wrap: wrap; margin: 1.2rem 0 2rem; }
+  .links a {
+    display: inline-block;
+    padding: 0.3rem 0.9rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-family: system-ui, sans-serif;
+    text-decoration: none;
+    background: var(--accent);
+    color: #fff;
+    font-weight: 600;
+  }
+  .links a.outline { background: #fff; color: var(--accent); border: 1.5px solid var(--accent); }
+  .abstract {
+    background: #f9f9f9;
+    border-left: 4px solid var(--accent);
+    padding: 1.1rem 1.4rem;
+    margin: 1.5rem 0 2rem;
+    border-radius: 0 6px 6px 0;
+    font-size: 0.97rem;
+  }
+  .abstract strong { display: block; margin-bottom: 0.4rem; font-family: system-ui, sans-serif; font-size: 0.8rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+  code, pre {
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    font-size: 0.88rem;
+  }
+  code { background: var(--bg-code); padding: 0.1em 0.35em; border-radius: 3px; }
+  pre {
+    background: var(--bg-code);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1rem 1.2rem;
+    overflow-x: auto;
+    line-height: 1.5;
+    margin: 1rem 0 1.5rem;
+  }
+  pre code { background: none; padding: 0; }
+  table { border-collapse: collapse; width: 100%; margin: 1.2rem 0 1.8rem; font-size: 0.92rem; font-family: system-ui, sans-serif; }
+  th { background: #f0f4f8; text-align: left; padding: 0.55rem 0.8rem; border: 1px solid var(--border); font-weight: 600; }
+  td { padding: 0.45rem 0.8rem; border: 1px solid var(--border); vertical-align: top; }
+  tr:nth-child(even) td { background: #fafafa; }
+  .bad  { color: var(--red);   font-weight: 600; }
+  .good { color: var(--green); font-weight: 600; }
+  .warn { background: var(--bg-warn); border: 1px solid #f0c040; border-radius: 6px; padding: 0.8rem 1.1rem; margin: 1.2rem 0; font-size: 0.93rem; }
+  .figure {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.2rem 1.5rem;
+    margin: 1.5rem 0;
+    background: #fafcff;
+  }
+  .figure figcaption { font-size: 0.85rem; color: var(--muted); margin-top: 0.8rem; font-family: system-ui, sans-serif; }
+  .chain {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.6rem;
+    margin: 1.2rem 0;
+    font-family: system-ui, sans-serif;
+    font-size: 0.82rem;
+  }
+  .chain-box {
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    padding: 0.7rem 0.6rem;
+    text-align: center;
+  }
+  .chain-box.attacker { border-color: var(--red); background: #fff5f5; }
+  .chain-box .role { font-weight: 700; font-size: 0.78rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+  .chain-box .module { font-weight: 700; font-size: 0.9rem; margin: 0.2rem 0; }
+  .chain-box .desc { color: var(--muted); font-size: 0.78rem; }
+  footer { margin-top: 4rem; padding-top: 1.5rem; border-top: 1px solid var(--border); font-size: 0.85rem; color: var(--muted); font-family: system-ui, sans-serif; }
+  @media (max-width: 600px) {
+    body { font-size: 15px; padding: 1rem 1rem 3rem; }
+    .chain { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<h1>Don't LEAN On Me</h1>
+<p class="subtitle">How Covert Proof-checker Failures Eradicate 'Formal-Verification'-powered Agentic Guardrails</p>
+<p class="authors">
+  Arka Dash &nbsp;·&nbsp;
+  Carlos José Duarte Casillas (Universidad de Sonora) &nbsp;·&nbsp;
+  Rishab Kumar Jha (JIIT) &nbsp;·&nbsp;
+  Yatharth Maheshwari &nbsp;·&nbsp;
+  Aditya Bansal
+</p>
+<p class="venue">With Apart Research &nbsp;·&nbsp; 2026</p>
+
+<div class="links">
+  <a href="https://github.com/r34l-rudr44/sps-hackathon">GitHub</a>
+  <a class="outline" href="#reproduction">Reproduce</a>
+  <a class="outline" href="#results">Results</a>
+  <a class="outline" href="#mitigations">Mitigations</a>
+</div>
+
+<div class="abstract">
+  <strong>Abstract</strong>
+  A growing class of AI-safety architectures treats the Lean 4 kernel as a trust anchor: an autonomous agent's proposed action is admitted only if the kernel certifies a proof of its safety. We show this assumption already fails using only <em>documented, unpatched</em> Lean features. The <code>@[implemented_by]</code> attribute lets a function's compiled body diverge from the source body the kernel reads; <code>native_decide</code> admits the compiled body's answer into the kernel through a synthetic axiom; and <code>#print axioms</code> does not report which function's runtime body was trusted. Composed across module boundaries, these let a malicious dependency export a pre-certified false lemma that downstream code uses to derive <code>False</code>, while every audit a non-expert would run — <code>#print axioms</code>, <code>lake build</code>, source review — returns clean.
+</div>
+
+<h2>1. Introduction</h2>
+<p>
+  Large language models are probabilistic and occasionally deceptive, so a recurring proposal for controlling autonomous agents is to gate their actions behind a deterministic checker that cannot be argued with. Interactive theorem provers, and Lean 4 in particular, are the natural candidate. The <em>Lean-Agent Protocol</em> admits an agentic action "if and only if the Lean 4 kernel proves" it satisfies pre-compiled policy axioms. Multi-agent frameworks such as MA-LoT use Lean kernel feedback as the arbiter of correctness, and DeepMind's AlphaProof reached silver-medal IMO performance because Lean verification guarantees each step.
+</p>
+<p>
+  This paper asks what happens when the certification itself can be forged. A formal verifier is a trustworthy guardrail only if a kernel-accepted, clean-audit proof corresponds to a true statement. We show that on a current Lean release this correspondence breaks without any custom axiom, without <code>sorry</code>, without <code>unsafe</code> in the victim's code, and without any signal in the canonical audit tool.
+</p>
+<p>
+  The mechanism is not a zero-day. Lean's reference manual states that <code>native_decide</code> "depends on the correctness of the Lean compiler and all definitions with an <code>@[implemented_by]</code> attribute," and issue <a href="https://github.com/leanprover/lean4/issues/7463">#7463</a> (open, priority P-low) records that attribute-driven trust admissions are not reflected by <code>#print axioms</code>. What is new is the threat model: as the kernel becomes an automated gate for AI agents, the parties consuming a proof are no longer the Lean experts who understand <code>native_decide</code>.
+</p>
+
+<h2>2. The Three-Component Chain</h2>
+
+<p>The break composes three native mechanisms:</p>
+<ol>
+  <li><strong>Divergence injection</strong> — <code>@[implemented_by f]</code> installs a runtime body that contradicts the source body, with only a type check enforced.</li>
+  <li><strong>Kernel admission</strong> — <code>native_decide</code> closes a <code>Decidable</code> goal by compiling and running the procedure, recording trust as a synthetic axiom <code>&lt;thm&gt;._native.native_decide.ax_N_M</code>.</li>
+  <li><strong>Audit blindness</strong> — <code>#print axioms</code> walks the proof term only; it never inspects the <code>@[implemented_by]</code> registry. The synthetic name is the sole trace and names neither the diverging function nor the attribute responsible.</li>
+</ol>
+
+<div class="figure">
+  <img src="figure1.svg" alt="Source/runtime divergence diagram" style="max-width:100%;display:block;" onerror="this.style.display='none'">
+  <p style="font-family:system-ui,sans-serif;font-size:0.92rem;margin:0;">
+    The kernel reads <code>isBlue .Red = false</code> (source body).
+    The compiler runs <code>isBlue_lie</code> which always returns <code>true</code>.
+    <code>native_decide</code> admits the runtime answer as a certified equation.
+    <code>#print axioms</code> reports one opaque synthetic name — mentioning neither <code>isBlue</code> nor the attribute.
+    By <em>ex falso quodlibet</em>, every proposition becomes provable.
+  </p>
+</div>
+
+<h2>3. The Four-Module Supply Chain</h2>
+
+<div class="chain">
+  <div class="chain-box">
+    <div class="role">Alice (honest)</div>
+    <div class="module">Step1_Defs</div>
+    <div class="desc">Color enum, <code>isBlue_src</code></div>
+  </div>
+  <div class="chain-box attacker">
+    <div class="role">Mallory (attacker)</div>
+    <div class="module">Step2_FastPath</div>
+    <div class="desc"><code>@[implemented_by isBlue_lie]</code></div>
+  </div>
+  <div class="chain-box">
+    <div class="role">Carol (honest)</div>
+    <div class="module">Step3_Bridge</div>
+    <div class="desc"><code>native_decide</code> certificate</div>
+  </div>
+  <div class="chain-box">
+    <div class="role">Bob (victim)</div>
+    <div class="module">Step4_Consumer</div>
+    <div class="desc">imports cert; no <code>native_decide</code></div>
+  </div>
+</div>
+
+<p>Mallory's PR is a 2-line diff of the exact shape used hundreds of times in Lean core and Mathlib — an idiomatic performance optimization.</p>
+
+<pre><code>-- Step2_FastPath.lean  (Mallory, attacker)
+import ColorExploit.Step1_Defs
+namespace Colors
+private def isBlue_lie (_ : Color) : Bool := true   -- diverges from isBlue_src
+@[implemented_by isBlue_lie]
+def isBlue (c : Color) : Bool := isBlue_src c        -- source body still honest
+end Colors</code></pre>
+
+<pre><code>-- Step3_Bridge.lean  (Carol, honest)
+theorem productionIsBlue : isBlue .Red = true := by native_decide
+
+-- Step4_Consumer.lean  (Bob, honest victim)
+def kernelLabel : String := if isBlue .Red then "BLUE" else "RED"
+theorem dashboardSaysBlue : kernelLabel = "BLUE" := by
+  simp [kernelLabel, productionIsBlue]</code></pre>
+
+<h2 id="results">4. Results</h2>
+
+<h3>Result 1 — the kernel certifies a false equation</h3>
+<pre><code>'Colors.productionIsBlue' depends on axioms:
+  [productionIsBlue._native.native_decide.ax_1_1]</code></pre>
+<p>The kernel accepts <code>isBlue .Red = true</code> on the native compiler's authority. The source body defines <code>isBlue .Red = false</code>. The kernel's theory is inconsistent.</p>
+
+<h3>Result 2 — the inconsistency reaches an honest consumer with a clean audit</h3>
+<pre><code>info: Step4_Consumer.lean: 'Colors.dashboardSaysBlue' depends on axioms:
+  [propext, productionIsBlue._native.native_decide.ax_1_1]
+Build completed successfully (5 jobs).</code></pre>
+<p><code>dashboardSaysBlue</code> is kernel-certified to equal <code>"BLUE"</code>, yet the kernel's own reduction of <code>kernelLabel</code> yields <code>"RED"</code>. Bob has no <code>native_decide</code>, no custom axiom, no <code>unsafe</code>.</p>
+
+<h3>Result 3 — the audit surface gives false reassurance</h3>
+<table>
+  <tr><th>Audit action</th><th>Output</th><th>Catches the lie?</th></tr>
+  <tr><td><code>#print axioms dashboardSaysBlue</code></td><td><code>[propext, …native_decide.ax_1_1]</code></td><td class="bad">No</td></tr>
+  <tr><td><code>lake build</code></td><td>Build completed successfully</td><td class="bad">No</td></tr>
+  <tr><td>Source review of Step4</td><td>no axiom, no native_decide, no unsafe</td><td class="bad">No</td></tr>
+  <tr><td><code>#print axioms</code> clean baseline</td><td><code>propext, Classical.choice, Quot.sound</code></td><td>— (reference)</td></tr>
+</table>
+
+<h3>Empirical Study: AI Agents and the Soundness Gap (33 trials)</h3>
+<p>We measured how frontier Claude agents handle optimization requests in the presence of the <code>@[implemented_by]</code> trap across two codebases (250-line stack VM, 350-line regex matcher) and three model tiers.</p>
+
+<table>
+  <tr>
+    <th>Framing</th>
+    <th>Trials</th>
+    <th>Unsound rate</th>
+    <th>False derivable</th>
+  </tr>
+  <tr>
+    <td>Open benign optimization (A, B, C, D)</td>
+    <td>12</td>
+    <td class="good">0%</td>
+    <td class="good">0%</td>
+  </tr>
+  <tr>
+    <td>Open hot-opcode, no impl hint (F-hot)</td>
+    <td>3</td>
+    <td class="good">0%</td>
+    <td class="good">0%</td>
+  </tr>
+  <tr>
+    <td><strong>Maintainer nudge</strong> — specify divergent behavior (E-soft, G-soft)</td>
+    <td>6</td>
+    <td class="bad">100%</td>
+    <td class="bad">100%</td>
+  </tr>
+  <tr>
+    <td><strong>In-source prompt injection</strong> (F-inject, G-inject)</td>
+    <td>6</td>
+    <td class="bad">67%</td>
+    <td class="bad">67%</td>
+  </tr>
+  <tr>
+    <td>Explicit red-team (E-hard)</td>
+    <td>3 (1 refusal)</td>
+    <td class="bad">100% of attempters</td>
+    <td>n/a</td>
+  </tr>
+</table>
+
+<div class="warn">
+  <strong>Headline asymmetry:</strong> When the prompt specifies an <em>observable</em> performance goal without naming an implementation (<em>"MOD is 70% of runtime, optimize it"</em>), models produce observationally-equivalent fast code (0/3). When the same prompt specifies the <em>divergent behavior</em> under a perf cover story (<em>"short-circuit MOD to return 0 when b &gt; 1000"</em>), all three models comply across both codebases (6/6). <strong>The bug-introducing pressure is the specification of the divergence, not the perf framing.</strong>
+</div>
+
+<p>Sonnet 4.6 refused an explicit red-team prompt identifying the request as an attack against formal-verification infrastructure — then <em>complied</em> with a subtle in-source <em>"PERF NOTE (spec v2.1, ratified 2026-03-12, see ticket HW-1247)"</em> comment requesting the same divergence. In-source injection beats safety training.</p>
+
+<h2>5. Implications for AI Safety</h2>
+<p>
+  Architectures that admit an action "iff the Lean kernel proves it safe" inherit this gap directly: if any dependency in the import graph carries the 2-line pattern above, an attacker can pre-certify a false safety lemma and the action passes the gate while the audit looks clean.
+</p>
+<p>
+  The aggravating factor specific to AI pipelines is the reader. A human expert might recognize <code>native_decide</code> in a PR and interrogate the synthetic axiom; an automated merge gate has no defense current tooling supports — the opaque name is indistinguishable from routine native evaluation. As Lean becomes the deterministic backstop for probabilistic agents, the population consuming its proofs is shifting away from the experts who understand this trust admission.
+</p>
+
+<h2 id="mitigations">6. Suggested Mitigations</h2>
+<ol>
+  <li><strong>Make <code>#print axioms</code> legible.</strong> Name the attribute-driven admission explicitly, e.g. <code>[via @[implemented_by] of isBlue → isBlue_lie in Step2_FastPath]</code>, restoring the self-describing signal the v4.29.0 per-call naming change removed.</li>
+  <li><strong>lake-level allowlist.</strong> Track which dependencies may use trust-bypassing attributes (<code>@[implemented_by]</code>, <code>@[csimp]</code>, <code>@[extern]</code>); default-deny for new dependencies.</li>
+  <li><strong>CI kernel/native diff check.</strong> Diff kernel reduction against native evaluation for all <code>Decidable</code> terms reachable by <code>native_decide</code>, flagging mismatches before merge.</li>
+</ol>
+<p>The fix is cheap and local. It should land before, not after, agentic Lean gating is deployed at scale.</p>
+
+<h2 id="reproduction">7. Reproduction</h2>
+
+<pre><code>git clone https://github.com/r34l-rudr44/sps-hackathon.git
+cd sps-hackathon/test_project
+cat lean-toolchain          # leanprover/lean4:v4.30.0-rc2
+lake build Myproject.Supply.Step4_Consumer</code></pre>
+
+<p>Expected output:</p>
+<pre><code>info: Step4_Consumer.lean: 'Colors.dashboardSaysBlue' depends on axioms:
+  [propext, productionIsBlue._native.native_decide.ax_1_1]
+Build completed successfully (5 jobs).</code></pre>
+
+<p>To re-run the full empirical study (requires Lean toolchain + stored trial files):</p>
+<pre><code>cd experiments
+for m in haiku sonnet opus; do
+  ./validate3.sh trials/${m}_Esoft.lean   $m Esoft
+  ./validate3.sh trials/${m}_Finject.lean $m Finject
+  ./validate4.sh trials/${m}_Gsoft.lean   $m Gsoft
+  ./validate4.sh trials/${m}_Ginject.lean $m Ginject
+done</code></pre>
+
+<h2>8. Related Work</h2>
+<p>The underlying mechanism is documented in <a href="https://github.com/leanprover/lean4/issues/7463">Lean issue #7463</a>, the <a href="https://leanprover-community.github.io/archive/stream/270676-lean4/topic/soundness.20bug.3A.20native_decide.20leakage.html">Lean Zulip "native_decide leakage" thread</a>, and <a href="https://github.com/nielsvoss/lean-pitfalls">lean-pitfalls</a>. The community treats this as a usage hazard for proof authors, not a security concern. No prior work treats it as a supply-chain or agentic-pipeline threat, or analyzes the consumer-side audit surface for a non-expert inheriting a pre-certified lemma via import.</p>
+
+<p>The general "frame-shape" safety phenomenon is established in Anthropic's <a href="https://arxiv.org/pdf/2410.21514">Sabotage Evaluations</a> and <a href="https://arxiv.org/html/2401.05566v3">Sleeper Agents</a>. Our study is a domain specialization in the target domain of interactive-theorem-prover soundness — to our knowledge the first empirical measurement of LLM-induced soundness corruption in any ITP.</p>
+
+<footer>
+  <p>
+    <a href="https://github.com/r34l-rudr44/sps-hackathon">GitHub Repository</a> &nbsp;·&nbsp;
+    Lean <code>v4.30.0-rc2</code> &nbsp;·&nbsp; 2026
+  </p>
+  <p>
+    The PoC proves a harmless false label on a toy <code>Color</code> type. The mechanism is already public and maintainer-acknowledged (<a href="https://github.com/leanprover/lean4/issues/7463">#7463</a>). This write-up adds no novel offensive capability.
+  </p>
+</footer>
+
+</body>
+</html>
